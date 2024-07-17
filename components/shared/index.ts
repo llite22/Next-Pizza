@@ -4,4 +4,6 @@ export { Header } from "./Header"
 export { SortPopup } from "./SortPopup"
 export { Title } from "./Title"
 export { TopBar } from "./TopBar"
+export { Filters } from "./Filters"
+export { FilterCheckbox } from "./FilterCheckbox"
 
