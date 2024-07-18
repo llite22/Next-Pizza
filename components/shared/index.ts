@@ -6,4 +6,5 @@ export { Title } from "./Title"
 export { TopBar } from "./TopBar"
 export { Filters } from "./Filters"
 export { FilterCheckbox } from "./FilterCheckbox"
+export { ProductGroupList } from "./ProductGroupList"
 
