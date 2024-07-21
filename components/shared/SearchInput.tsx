@@ -23,8 +23,13 @@ export const SearchInput = ({ className }: SearchInputProps) => {
   useClickAway(ref, () => setFocused(false));
 
   useDebounce(
-    () => {
-      Api.products.search(searchQuery).then((items) => setProducts(items));
+    async () => {
+      try {
+        const responce = await Api.products.search(searchQuery);
+        setProducts(responce);
+      } catch (e) {
+        console.error(e);
+      }
     },
     250,
     [searchQuery]
