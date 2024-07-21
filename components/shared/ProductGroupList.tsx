@@ -23,7 +23,7 @@ export const ProductGroupList = ({
   className,
 }: ProductGroupListProps) => {
   const setActiveCategoryId = useCategoryStore((state) => state.setActiveId);
-  const intersectionRef = useRef(null);
+  const intersectionRef = useRef<HTMLDivElement>(null);
   const intersection = useIntersection(intersectionRef, {
     threshold: 0.2,
   });

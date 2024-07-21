@@ -4,19 +4,38 @@ import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
 import { useRef, useState } from "react";
 import { Input } from "../ui";
-import { useClickAway } from "react-use";
+import { useClickAway, useDebounce } from "react-use";
 import Link from "next/link";
 import Image from "next/image";
+import { Api } from "@/services/api-client";
+import { Product } from "@prisma/client";
 
 interface SearchInputProps {
   className?: string;
 }
 
 export const SearchInput = ({ className }: SearchInputProps) => {
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [focused, setFocused] = useState<boolean>(false);
+  const [products, setProducts] = useState<Product[]>([]);
   const ref = useRef<HTMLInputElement>(null);
 
   useClickAway(ref, () => setFocused(false));
+
+  useDebounce(
+    () => {
+      Api.products.search(searchQuery).then((items) => setProducts(items));
+    },
+    250,
+    [searchQuery]
+  );
+
+  const onClickItem = () => {
+    setSearchQuery("");
+    setProducts([]);
+    setFocused(false);
+  };
+
   return (
     <>
       {focused && (
@@ -36,27 +55,35 @@ export const SearchInput = ({ className }: SearchInputProps) => {
           type="text"
           placeholder="Найти пиццу..."
           onFocus={() => setFocused(true)}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <div
-          className={cn(
-            "absolute w-full bg-white rounded-xl py-2 top-14 shadow-md transition-all duration-200 invisible opacity-0 z-30",
-            focused && "visible opacity-100 top-12"
-          )}
-        >
-          <Link
-            className="flex items-center gap-3 px-3 py-2 hover:bg-primary/10"
-            href={"/product/1"}
+        {products.length > 0 && (
+          <div
+            className={cn(
+              "absolute w-full bg-white rounded-xl py-2 top-14 shadow-md transition-all duration-200 invisible opacity-0 z-30",
+              focused && "visible opacity-100 top-12"
+            )}
           >
-            <Image
-              src="/chorizofrash.webp"
-              className="rounded-sm"
-              width={32}
-              height={32}
-              alt="Пицца 1"
-            />
-            <span>Пицца 1</span>
-          </Link>
-        </div>
+            {products.map((product) => (
+              <Link
+                onClick={onClickItem}
+                key={product.id}
+                className="flex items-center gap-3 px-3 py-2 hover:bg-primary/10"
+                href={`/product/${product.id}`}
+              >
+                <img
+                  src={product.imageUrl}
+                  className="rounded-sm"
+                  width={32}
+                  height={32}
+                  alt={product.name}
+                />
+                <span>{product.name}</span>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );
